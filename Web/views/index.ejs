@@ -1,0 +1,125 @@
+<%- include('./partial/header.ejs') %>
+<!-- Content Wrapper. Contains page content -->
+<div class="content-wrapper">
+    <!-- Content Header (Page header) -->
+    <div class="content-header">
+        <div class="container-fluid">
+            <div class="row mb-2">
+                <div class="col-sm-6">
+                    <h1 class="m-0">Thông tin truyện</h1>
+                </div><!-- /.col -->
+                <div class="col-sm-6">
+                    <ol class="breadcrumb float-sm-right">
+                        <li class="breadcrumb-item"><a href="#">Trang chủ</a></li>
+                        <li class="breadcrumb-item active">Danh sách truyện</li>
+                    </ol>
+                </div><!-- /.col -->
+            </div><!-- /.row -->
+        </div><!-- /.container-fluid -->
+    </div>
+    <!-- /.content-header -->
+    <section class="content">
+        <div class="container-fluid">
+            <div class="row">
+                <div class="col-12">
+                    <div class="card">
+                        <div class="card-header">
+                            <h3 class="card-title">Bảng thông tin truyện</h3>
+                        </div>
+                        <!-- /.card-header -->
+                        <div class="card-body table-responsive p-0">
+                            <table class="table table-hover text-nowrap">
+                                <thead>
+                                    <tr>
+                                        <th>Ngày</th>
+                                        <th>Thời gian</th>
+                                        <th>Tên truyện</th>
+                                        <th>Tác giả</th>
+                                        <th>Thể loại</th>
+                                        <th>Nút đọc</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="tb_list">
+                                    <!-- Dữ liệu sẽ được tạo và thêm sau khi tải -->
+                                </tbody>
+                            </table>
+                        </div>
+                        <!-- /.card-body -->
+                    </div>
+                    <!-- /.card -->
+                </div>
+            </div>
+        </div>
+    </section>
+</div>
+
+<%- include('./partial/scripts.ejs') %>
+
+<script>
+    $(document).ready(function () {
+        // Lấy danh sách ban đầu khi trang được tải
+        getlist();
+
+        // Lấy dữ liệu và hiển thị nội dung khi nhấn nút đọc
+        $(document).on('click', '.read-btn', function () {
+            var id = $(this).data('id');
+            var currentRow = $('#' + id);
+            var noidung = currentRow.find('.noidung').text();
+            $('#noidungModal .modal-body').text(noidung);
+            $('#noidungModal').modal('show');
+        });
+
+        // Lấy danh sách từ API và hiển thị trên bảng
+        function getlist() {
+            $.ajax({
+                url: 'http://localhost:8282/api/novel',
+                type: 'get',
+                dataType: 'JSON',
+            }).done(function (result) {
+                if (result) {
+                    // Sắp xếp dữ liệu theo thời gian giảm dần
+                    result.sort(function(a, b) {
+                        return new Date(b.ngaynhan + ' ' + b.gionhan) - new Date(a.ngaynhan + ' ' + a.gionhan);
+                    });
+
+                    var resData = "";
+                    result.forEach(el => {
+                        resData += "<tr id=" + el.id + ">" +
+                            "<td>" + el.ngaynhan + "</td>" +
+                            "<td>" + el.gionhan + "</td>" +
+                            "<td>" + el.tentruyen + "</td>" +
+                            "<td>" + el.tacgia + "</td>" +
+                            "<td>" + el.theloai + "</td>" +
+                            "<td class='noidung' style='display:none;'>" + el.noidung + "</td>" +
+                            "<td><button class='read-btn' data-id='" + el.id + "'>Đọc</button></td>" +
+                            "</tr>";
+                    });
+                    $("#tb_list").html(resData);
+                }
+            });
+        }
+    });
+</script>
+
+<!-- Modal hiển thị nội dung -->
+<div class="modal fade" id="noidungModal" tabindex="-1" role="dialog" aria-labelledby="noidungModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="noidungModalLabel">Nội dung truyện</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <!-- Nội dung truyện sẽ được hiển thị ở đây -->
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Đóng</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<%- include('./partial/footer.ejs') %>

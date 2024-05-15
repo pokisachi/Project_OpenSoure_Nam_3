@@ -1,0 +1,284 @@
+<%- include('../partial/header.ejs') %>
+  <!-- Content Wrapper. Contains page content -->
+  <div class="content-wrapper">
+    <!-- Content Header (Page header) -->
+    <div class="content-header">
+      <div class="container-fluid">
+        <div class="row mb-2">
+          <div class="col-sm-6">
+            <h1 class="m-0">Thông tin truyện</h1>
+          </div><!-- /.col -->
+          <div class="col-sm-6">
+            <ol class="breadcrumb float-sm-right">
+              <li class="breadcrumb-item"><a href="#">Trang chủ</a></li>
+              <li class="breadcrumb-item active">Danh sách truyện</li>
+            </ol>
+          </div><!-- /.col -->
+        </div><!-- /.row -->
+      </div><!-- /.container-fluid -->
+    </div>
+    <!-- /.content-header -->
+    <section class="content">
+      <div class="container-fluid">
+        <div class="row">
+          <div class="col-12">
+            <div class="card">
+              <div class="card-header">
+                <h3 class="card-title">Thêm dữ liệu mới</h3>
+              </div>
+              <div class="card-body table-responsive p-0">
+                <div class="card-body">
+                  <div class="form-group">
+                    <label>Tên truyện</label>
+                    <input type="text" class="form-control" id="tentruyen">
+                  </div>
+                  <div class="form-group">
+                    <label>Tác giả</label>
+                    <input type="text" class="form-control" id="tacgia">
+                  </div>
+                  <div class="form-group">
+                    <label>Thể loại</label>
+                    <input type="text" class="form-control" id="theloai">
+                  </div>
+                  <div class="form-group">
+                    <label for="noidung">Nội dung</label>
+                    <textarea type="text" class="form-control" id="noidung" style="width: 100%; height: 500px;"></textarea>
+                  </div>
+                  <div class="form-group">
+                    <button type="button" class="btn btn-info btn-flat" id="themmoi">Thêm mới</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="row">
+              <div class="col-12">
+                <div class="card">
+                  <div class="card-header">
+                    <h3 class="card-title">Bảng thông tin truyện</h3>
+                  </div>
+                  <!-- /.card-header -->
+                  <div class="card-body table-responsive p-0">
+                    <table class="table table-hover text-nowrap">
+                      <thead>
+                        <tr>
+                          <th>Ngày</th>
+                          <th>Thời gian</th>
+                          <th>Tên truyện</th>
+                          <th>Thể loại</th>
+                          <th>Tác giả</th>
+                          <th>Nội dung</th>
+                          <th>Thao tác</th>
+                        </tr>
+                      </thead>
+                      <tbody id="tb_list">
+                      </tbody>
+                    </table>
+                  </div>
+                  <!-- /.card-body -->
+                </div>
+                <!-- /.card -->
+              </div>
+            </div>
+            <div class="modal fade" id="editModal" tabindex="-1" role="dialog" aria-labelledby="editModalLabel" aria-hidden="true">
+              <div class="modal-dialog" role="document">
+                  <div class="modal-content">
+                      <div class="modal-header">
+                          <h5 class="modal-title" id="editModalLabel">Sửa Thông Tin</h5>
+                          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                              <span aria-hidden="true">&times;</span>
+                          </button>
+                      </div>
+                      <div class="modal-body">
+                          <div class="form-group">
+                              <label for="edit_tentruyen">Tên truyện:</label>
+                              <input type="text" class="form-control" id="edit_tentruyen">
+                          </div>
+                          <div class="form-group">
+                            <label for="edit_tacgia">Tác giả:</label>
+                            <input type="text" class="form-control" id="edit_tacgia">
+                        </div>
+                        <div class="form-group">
+                          <label for="edit_theloai">Thể loại:</label>
+                          <input type="text" class="form-control" id="edit_theloai">
+                      </div>
+                      <div class="form-group">
+                        <label for="edit_noidung">Nội dung:</label>
+                        <textarea type="text" class="form-control" id="edit_noidung" style="width: 100%; height: 500px;"></textarea>
+                    </div>
+                      </div>
+                      <div class="modal-footer">
+                          <button type="button" class="btn btn-secondary" data-dismiss="modal">Đóng</button>
+                          <button type="button" class="btn btn-primary" id="luuSua">Lưu Thay Đổi</button>
+                      </div>
+                  </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+  </div>
+  </section>
+  </div>
+
+<%- include('../partial/scripts.ejs') %>
+
+<script>
+  $(document).ready(function () {
+    // Lấy danh sách ban đầu khi trang được tải
+    getlist();
+
+    //SỬA
+    $(document).on('click', '.edit-btn', function () {
+      var id = $(this).data('id');
+      var currentRow = $('#' + id);
+
+      // Lấy các giá trị hiện tại từ hàng bảng
+      var currenttentruyen = currentRow.find('.tentruyen').text();
+      var currenttacgia = currentRow.find('.tacgia').text();
+      var currenttheloai = currentRow.find('.theloai').text();
+      var currentnoidung = currentRow.find('.noidung').text();
+
+      // Hiển thị cửa sổ sửa đổi với các giá trị hiện tại
+      $('#editModal').modal('show');
+      $('#edit_tentruyen').val(currenttentruyen);
+      $('#edit_tacgia').val(currenttacgia);
+      $('#edit_theloai').val(currenttheloai);
+      $('#edit_noidung').val(currentnoidung);
+
+      // Lưu id của hàng đang được sửa
+      $('#editModal').data('id', id);
+    });
+
+    // Lưu sự thay đổi sau khi sửa
+    $('#luuSua').click(function () {
+      var id = $('#editModal').data('id');
+      var newtentruyen = $('#edit_tentruyen').val();
+      var newtacgia = $('#edit_tacgia').val();
+      var newtheloai = $('#edit_theloai').val();
+      var newnoidung = $('#edit_noidung').val();
+      // Kiểm tra và chỉ gửi các giá trị đã thay đổi lên máy chủ
+      var dataToUpdate = {};
+      if (newtentruyen !== "") {
+          dataToUpdate['tentruyen'] = newtentruyen;
+      }
+      if (newtacgia !== "") {
+          dataToUpdate['tacgia'] = newtacgia;
+      }
+      if (newtheloai !== "") {
+          dataToUpdate['theloai'] = newtheloai;
+      }
+      if (newnoidung !== "") {
+          dataToUpdate['noidung'] = newnoidung;
+      }
+
+      if (Object.keys(dataToUpdate).length === 0) {
+          // Không có dữ liệu mới được nhập, không cần gửi yêu cầu sửa đổi
+          $('#editModal').modal('hide');
+          return;
+      }
+
+      $.ajax({
+          url: 'http://localhost:8282/api/novel/' + id,
+          type: 'put',
+          dataType: 'JSON',
+          data: dataToUpdate
+      }).done(function (result) {
+          // Cập nhật lại dữ liệu trên hàng bảng
+          var currentRow = $('#' + id);
+          if (newtentruyen !== "") {
+              currentRow.find('.tentruyen').text(newtentruyen);
+          }
+          if (newtacgia !== "") {
+              currentRow.find('.tacgia').text(newtacgia);
+          }
+          if (newtheloai !== "") {
+              currentRow.find('.theloai').text(newtheloai);
+          }
+          if (newnoidung !== "") {
+              currentRow.find('.noidung').text(newnoidung);
+          }
+
+          $('#editModal').modal('hide');
+          alert("Sửa thành công");
+          getlist();
+      });
+    });
+
+    // Xóa
+    $(document).on('click', '.delete-btn', function () {
+        var id = $(this).data('id');
+        $.ajax({
+            url: 'http://localhost:8282/api/novel/' + id,
+            type: 'delete',
+            dataType: 'JSON',
+        }).done(function (result) {
+            $('#' + id).remove();
+            resetControl();
+            alert("Xóa thành công");
+        });
+    });
+
+    // Thêm mới
+    $('#themmoi').click(function () {
+        $.ajax({
+            url: 'http://localhost:8282/api/novel',
+            type: 'post',
+            dataType: 'JSON',
+            data: {
+                'tentruyen': $('#tentruyen').val(),
+                'tacgia': $('#tacgia').val(),
+                'theloai': $('#theloai').val(),
+                'noidung': $('#noidung').val(),
+            }
+        }).done(function (result) {
+            if (result) {
+                resData = "<tr id= " + result.id + "><td>" + result.ngaynhan + "</td><td>" + result.gionhan + "</td>" +
+                    "<td class='tentruyen'>" + result.tentruyen + "</td>" +
+                    "<td class='tacgia'>" + result.tacgia + "</td>" +
+                    "<td class='theloai'>" + result.theloai + "</td>" +
+                    "<td class='noidung'>" + result.noidung + "</td>" +
+                    "<td><button class='delete-btn' data-id='" + result.id + "'>Xóa</button></td>" +
+                    "<td><button class='edit-btn' data-id='" + result.id + "'>Sửa</button></td>" +
+                    "</tr>";
+                $("#tb_list").prepend(resData);
+                resetControl();
+                alert("Thêm thành công");
+            }
+        });
+    });
+
+    // Đặt lại điều khiển
+    function resetControl() {
+        $('#tentruyen').val('');
+        $('#tacgia').val('');
+        $('#theloai').val('');
+        $('#noidung').val('');
+    }
+
+    // Lấy danh sách từ API và hiển thị trên bảng
+    function getlist() {
+        $.ajax({
+            url: 'http://localhost:8282/api/novel',
+            type: 'get',
+            dataType: 'JSON',
+        }).done(function (result) {
+            if (result) {
+                resData = "";
+                result.forEach(el => {
+                    resData += "<tr id = " + el.id + "><td>" + el.ngaynhan + "</td><td>" + el.gionhan + "</td>" +
+                        "<td class='tentruyen'>" + el.tentruyen + "</td>" +
+                        "<td class='tacgia'>" + el.tacgia + "</td>" +
+                        "<td class='theloai'>" + el.theloai + "</td>" +
+                        "<td class='noidung'>" + el.noidung + "</td>" +
+                        "<td><button class='delete-btn' data-id='" + el.id + "'>Xóa</button></td>" +
+                        "<td><button class='edit-btn' data-id='" + el.id + "'>Sửa</button></td>" +
+                        "</tr>";
+                });
+                $("#tb_list").html(resData);
+            }
+        });
+    }
+});
+</script>
+
+<%- include('../partial/footer.ejs') %>
