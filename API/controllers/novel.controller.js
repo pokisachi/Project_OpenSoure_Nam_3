@@ -1,10 +1,10 @@
 const db = require("../models");
 const Novel = db.novel;
-//Bổ sung thêm ngày
+
 const moment = require("moment");
 
 
-// Create and Save a new Cambien
+
 exports.create = (req, res) => {
   // Validate request
   if (!req.body.tentruyen) {
@@ -27,13 +27,13 @@ exports.create = (req, res) => {
   const novel = new Novel({
     ngaynhan: moment().format("L"), //11/04/2023
     gionhan: moment().format("LT"), //21:07
-    tentruyen: req.body.tentruyen, // Thêm trường âm thanh vào đối tượng cảm biến
+    tentruyen: req.body.tentruyen, 
     theloai: req.body.theloai,
     tacgia: req.body.tacgia,
     noidung: req.body.noidung,
   });
 
-  // Save đối tượng cảm biến đó vào trong db
+  // Save đối tượng  vào trong db
   novel
     .save(novel)
     .then((data) => {
@@ -47,7 +47,7 @@ exports.create = (req, res) => {
     });
 };
 
-//Retrieve all Cảm biến/ find by receive day from the database
+
 exports.findAll = (req, res) => {
   const ngaynhan = req.query.ngaynhan;
   var condition = ngaynhan ? { ngaynhan: { $regex: new RegExp(ngaynhan), $options: "i" } } : {};
@@ -65,7 +65,7 @@ exports.findAll = (req, res) => {
     });
 };
 //Retrieve a single object
-//Find a single CamBien with an id
+//Find a single  with an id
 exports.findOne = (req, res) => {
   const id = req.params.id;
 
@@ -83,7 +83,7 @@ exports.findOne = (req, res) => {
 };
 
 //Update an object
-//Update a CamBien identified by the id in the request
+//Update a  identified by the id in the request
 exports.update = (req, res) => {
   if (!req.body) {
     return res.status(400).send({
@@ -110,7 +110,7 @@ exports.update = (req, res) => {
 
 
 //Delete an object
-//Delete a Cambien with the specified id
+//Delete a  with the specified id
 exports.delete = (req, res) => {
   const id = req.params.id;
 
@@ -135,7 +135,7 @@ exports.delete = (req, res) => {
 
 
 //Delete all objects
-//Delete all Cambien from the database
+//Delete all  from the database
 exports.deleteAll = (req, res) => {
   Novel.deleteMany({})
     .then((data) => {
